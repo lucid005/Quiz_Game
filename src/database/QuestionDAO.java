@@ -15,9 +15,8 @@ public class QuestionDAO {
             return;
         }
 
-        try {
-            String insertSQL = "INSERT INTO QUESTIONS (question_text, option_a, option_b, option_c, option_d, correct_answer, difficulty_level) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement stmt = connection.prepareStatement(insertSQL);
+        String insertSQL = "INSERT INTO quiz_questions (question_text, option_a, option_b, option_c, option_d, correct_answer, difficulty_level) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(insertSQL)) {
             stmt.setString(1, question.getQuestionText());
             stmt.setString(2, question.getOptionA());
             stmt.setString(3, question.getOptionB());
@@ -30,8 +29,6 @@ public class QuestionDAO {
             System.out.println("Quiz question added successfully.");
         } catch (SQLException e) {
             System.err.println("Error adding quiz question: " + e.getMessage());
-        } finally {
-            DatabaseConnection.closeConnection();
         }
     }
 
@@ -42,9 +39,8 @@ public class QuestionDAO {
             return;
         }
 
-        try {
-            String updateSQL = "UPDATE QUESTIONS SET question_text = ?, option_a = ?, option_b = ?, option_c = ?, option_d = ?, correct_answer = ?, difficulty_level = ? WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(updateSQL);
+        String updateSQL = "UPDATE quiz_questions SET question_text = ?, option_a = ?, option_b = ?, option_c = ?, option_d = ?, correct_answer = ?, difficulty_level = ? WHERE question_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(updateSQL)) {
             stmt.setString(1, question.getQuestionText());
             stmt.setString(2, question.getOptionA());
             stmt.setString(3, question.getOptionB());
@@ -58,46 +54,80 @@ public class QuestionDAO {
             System.out.println("Quiz question updated successfully.");
         } catch (SQLException e) {
             System.err.println("Error updating quiz question: " + e.getMessage());
-        } finally {
-            DatabaseConnection.closeConnection();
         }
     }
 
     // Get a quiz question by ID
     public Question_model getQuizQuestionById(int id) {
+        Question_model question = null;
+        
         Connection connection = DatabaseConnection.getConnection();
         if (connection == null) {
             return null;
         }
 
-        Question_model question = null;
-
-        try {
-            String selectSQL = "SELECT * FROM QUESTIONS WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(selectSQL);
-            stmt.setInt(1, id);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                question = new Question_model(
-                        rs.getInt("question_id"),
-                        rs.getString("question_text"),
-                        rs.getString("option_a"),
-                        rs.getString("option_b"),
-                        rs.getString("option_c"),
-                        rs.getString("option_d"),
-                        rs.getString("correct_answer"),
-                        rs.getString("difficulty_level")
-                );
+            String selectSQL = "SELECT * FROM quiz_questions WHERE question_id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(selectSQL)) {
+                stmt.setInt(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        question = new Question_model(
+                                rs.getInt("question_id"),
+                                rs.getString("question_text"),
+                                rs.getString("option_a"),
+                                rs.getString("option_b"),
+                                rs.getString("option_c"),
+                                rs.getString("option_d"),
+                                rs.getString("correct_answer"),
+                                rs.getString("difficulty_level")
+                        );
+                    } else {
+                        System.out.println("No question found with ID: " + id);
+                    }
+                }
             }
-        } catch (SQLException e) {
+         catch (SQLException e) {
             System.err.println("Error retrieving quiz question: " + e.getMessage());
-        } finally {
-            DatabaseConnection.closeConnection();
         }
 
         return question;
     }
+
+    
+    public List<Question_model> getQuizQuestionByDifficultyLevel(String difficultyLevel) {
+        List<Question_model> questions = new ArrayList<>();
+        Connection connection = DatabaseConnection.getConnection();
+            if (connection == null) {
+                return questions; 
+            }
+
+            String selectSQL = "SELECT * FROM quiz_questions WHERE difficulty_level = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(selectSQL)) {
+                stmt.setString(1, difficultyLevel);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        Question_model question = new Question_model(
+                                rs.getInt("question_id"),
+                                rs.getString("question_text"),
+                                rs.getString("option_a"),
+                                rs.getString("option_b"),
+                                rs.getString("option_c"),
+                                rs.getString("option_d"),
+                                rs.getString("correct_answer"),
+                                rs.getString("difficulty_level")
+                        );
+                        questions.add(question);
+                    }
+                }
+            }
+         catch (SQLException e) {
+            System.err.println("Error retrieving quiz questions: " + e.getMessage());
+        }
+
+        return questions;
+    }
+
 
     // Get all quiz questions
     public List<Question_model> getAllQuizQuestions() {
@@ -108,12 +138,10 @@ public class QuestionDAO {
 
         List<Question_model> questionList = new ArrayList<>();
 
-        try {
-            String selectSQL = "SELECT * FROM QUESTIONS";
-            PreparedStatement stmt = connection.prepareStatement(selectSQL);
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+        String selectSQL = "SELECT * FROM quiz_questions";
+        try (PreparedStatement stmt = connection.prepareStatement(selectSQL)) {
+            try (ResultSet rs = stmt.executeQuery();) {
+            	while (rs.next()) {
                 Question_model question = new Question_model(
                         rs.getInt("question_id"),
                         rs.getString("question_text"),
@@ -125,7 +153,9 @@ public class QuestionDAO {
                         rs.getString("difficulty_level")
                 );
                 questionList.add(question);
+            	}
             }
+            
         } catch (SQLException e) {
             System.err.println("Error retrieving quiz questions: " + e.getMessage());
         } finally {
@@ -142,9 +172,8 @@ public class QuestionDAO {
             return;
         }
 
-        try {
-            String deleteSQL = "DELETE FROM QUESTIONS WHERE id = ?";
-            PreparedStatement stmt = connection.prepareStatement(deleteSQL);
+        String deleteSQL = "DELETE FROM quiz_questions WHERE question_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(deleteSQL)) {
             stmt.setInt(1, id);
 
             stmt.executeUpdate();

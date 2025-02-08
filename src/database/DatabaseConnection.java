@@ -10,7 +10,7 @@ public class DatabaseConnection {
     private static final String USER = "root";
     private static final String PASSWORD = "Password_mysql10169";
     private static final String DB_NAME = "Quiz_Game";
-    
+ 
     private static Connection connection;
 
     public static Connection getConnection() {
@@ -42,5 +42,10 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.err.println("Error closing the connection: " + e.getMessage());
         }
+    }
+    
+    public static void main(String[] args) {
+    	getConnection();
+    	System.out.println("Database Connection Established!");
     }
 }
