@@ -65,6 +65,7 @@ public class AdminPanel extends JFrame {
 			public void run() {
 				try {
 					AdminPanel frame = new AdminPanel();
+					frame.setLocationRelativeTo(null);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -114,6 +115,14 @@ public class AdminPanel extends JFrame {
                 tableModel = new DefaultTableModel(new Object[]{"ID", "Question", "Option A", "Option B", "Option C", "Option D", "Answer", "Difficulty Level"}, 0);
                 table = new JTable(tableModel);
                 table.setRowHeight(30);
+                table.getColumnModel().getColumn(0).setPreferredWidth(50);  
+                table.getColumnModel().getColumn(1).setPreferredWidth(300);
+                table.getColumnModel().getColumn(2).setPreferredWidth(100); 
+                table.getColumnModel().getColumn(3).setPreferredWidth(100);
+                table.getColumnModel().getColumn(4).setPreferredWidth(100);
+                table.getColumnModel().getColumn(5).setPreferredWidth(100); 
+                table.getColumnModel().getColumn(6).setPreferredWidth(80);  
+                table.getColumnModel().getColumn(7).setPreferredWidth(120); 
 
                         JScrollPane DataTable = new JScrollPane(table);
                         DataTable.setBounds(12, 92, 740, 506);

@@ -50,8 +50,8 @@ public class DatabaseSetup {
         			"CREATE TABLE IF NOT EXISTS user_data (" +
         					"id INT AUTO_INCREMENT PRIMARY KEY, " +
         					"username VARCHAR(50) NOT NULL, " +
-        					"password VARCHAR(50), "+
-        					"role VARCHAR(50), " +
+        					"age INT, "+
+        					"difficulty_level VARCHAR(50), " +
         					");";
         	stmt.executeUpdate(createUserDataTableSQL);
         	System.out.println("user_data table created sucessfully.");
@@ -64,5 +64,6 @@ public class DatabaseSetup {
     
     public static void main(String[] args) {
     	createQuestionTable();
+    	createUserDataTable();
     }
 }

@@ -1,35 +1,41 @@
 package components;
 
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
-
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Path2D;
 import javax.swing.JButton;
 
 public class CustomButton extends JButton {
-
     private static final long serialVersionUID = 1L;
 
-    // Properties for customization
-    private int cornerRadius = 20; // Border radius
-    private Color shadowColor = new Color(0, 0, 0, 100); // Drop shadow color
-    private int shadowOffset = 5; // Drop shadow offset
-    private Color strokeColor = Color.BLACK; // Stroke color
-    private int strokeWidth = 2; // Stroke width
+    private Color defaultColor = new Color(144, 238, 144); // Light green
+    private Color hoverColor = new Color(102, 205, 102); // Default darker green
+    private boolean isHovered = false; // Flag to track hover state
 
     public CustomButton(String text) {
         super(text);
-        setContentAreaFilled(false); // Make the button transparent
-        setFocusPainted(false); // Remove the focus border
-        setFont(new Font("Arial Black", Font.BOLD, 24));
-        setForeground(Color.WHITE); // Text color
-        setPreferredSize(new Dimension(200, 50));
+        setContentAreaFilled(false);
+        setFocusPainted(false);
+        setForeground(new Color(34, 139, 34)); // Dark green text
+        setFont(new Font("Comic Sans MS", Font.BOLD, 28)); // Playful font
+
+        // Add hover effect using MouseListener
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                isHovered = true;
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+                repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                isHovered = false;
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                repaint();
+            }
+        });
     }
 
     @Override
@@ -40,78 +46,41 @@ public class CustomButton extends JButton {
         int width = getWidth();
         int height = getHeight();
 
-        // Draw drop shadow
-        g2.setColor(shadowColor);
-        g2.fill(new RoundRectangle2D.Double(
-            shadowOffset, shadowOffset, width - shadowOffset, height - shadowOffset, cornerRadius, cornerRadius
-        ));
+        // Create a wavy irregular border
+        Path2D.Float shape = new Path2D.Float();
+        shape.moveTo(10, 20);
+        shape.curveTo(40, 5, width - 40, 5, width - 10, 20);
+        shape.curveTo(width - 5, height / 2, width - 40, height - 5, width - 10, height - 10);
+        shape.curveTo(width / 2, height, 40, height - 5, 10, height - 10);
+        shape.curveTo(5, height / 2, 5, 20, 10, 20);
+        shape.closePath();
 
-        // Draw the button background
-        g2.setColor(getBackground());
-        g2.fill(new RoundRectangle2D.Double(
-            0, 0, width - shadowOffset, height - shadowOffset, cornerRadius, cornerRadius
-        ));
+        // Set background color (default or hover)
+        g2.setColor(isHovered ? hoverColor : defaultColor);
+        g2.fill(shape);
 
-        // Draw stroke (border)
-        g2.setColor(strokeColor);
-        g2.setStroke(new BasicStroke(strokeWidth));
-        g2.draw(new RoundRectangle2D.Double(
-            strokeWidth / 2.0, strokeWidth / 2.0, width - shadowOffset - strokeWidth, height - shadowOffset - strokeWidth, cornerRadius, cornerRadius
-        ));
+        // Draw button border
+        g2.setColor(new Color(34, 139, 34)); // Darker green border
+        g2.setStroke(new BasicStroke(4));
+        g2.draw(shape);
 
-        // Draw the button text
-        super.paintComponent(g2);
+        // Draw text
+        FontMetrics fm = g2.getFontMetrics();
+        int textX = (width - fm.stringWidth(getText())) / 2;
+        int textY = (height + fm.getAscent()) / 2 - 4;
+        g2.drawString(getText(), textX, textY);
+
         g2.dispose();
+        super.paintComponent(g);
     }
 
     @Override
     protected void paintBorder(Graphics g) {
-        // Do not paint the default border
+        // Do not paint default border
     }
 
-    // Getters and setters for customization properties
-    public int getCornerRadius() {
-        return cornerRadius;
-    }
-
-    public void setCornerRadius(int cornerRadius) {
-        this.cornerRadius = cornerRadius;
-        repaint();
-    }
-
-    public Color getShadowColor() {
-        return shadowColor;
-    }
-
-    public void setShadowColor(Color shadowColor) {
-        this.shadowColor = shadowColor;
-        repaint();
-    }
-
-    public int getShadowOffset() {
-        return shadowOffset;
-    }
-
-    public void setShadowOffset(int shadowOffset) {
-        this.shadowOffset = shadowOffset;
-        repaint();
-    }
-
-    public Color getStrokeColor() {
-        return strokeColor;
-    }
-
-    public void setStrokeColor(Color strokeColor) {
-        this.strokeColor = strokeColor;
-        repaint();
-    }
-
-    public int getStrokeWidth() {
-        return strokeWidth;
-    }
-
-    public void setStrokeWidth(int strokeWidth) {
-        this.strokeWidth = strokeWidth;
-        repaint();
+    // Setter method for customizing hover color
+    public void setHoverColor(Color hoverColor) {
+        this.hoverColor = hoverColor;
     }
 }
