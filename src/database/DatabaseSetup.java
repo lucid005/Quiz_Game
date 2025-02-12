@@ -48,10 +48,15 @@ public class DatabaseSetup {
         	
         	String createUserDataTableSQL = 
         			"CREATE TABLE IF NOT EXISTS user_data (" +
-        					"id INT AUTO_INCREMENT PRIMARY KEY, " +
+        					"user_id INT AUTO_INCREMENT PRIMARY KEY, " +
         					"username VARCHAR(50) NOT NULL, " +
         					"age INT, "+
         					"difficulty_level VARCHAR(50), " +
+        					"score1 INT," +
+        					"score2 INT," +
+        					"score3 INT," +
+        					"score4 INT," +
+        					"score5 INT" +
         					");";
         	stmt.executeUpdate(createUserDataTableSQL);
         	System.out.println("user_data table created sucessfully.");

@@ -8,6 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import components.CustomButton;
+import model.User_model;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -19,12 +21,17 @@ public class Main {
 
         CardLayout cardLayout = new CardLayout();
         JPanel parentPanel = new JPanel(cardLayout);
+        
+        User_model user = new User_model(0, "", 0);
+        String difficultyLevel = user.getDifficulty_level(); 
 
         JPanel beginPanel = new JPanel(null); 
         LoadingPanel loadingPanel = new LoadingPanel(cardLayout, parentPanel);
         MainMenuPanel mainMenuPanel = new MainMenuPanel(cardLayout, parentPanel);
-        GamePanel gamePanel = new GamePanel(cardLayout, parentPanel);
         PlayerDetailsPanel playerDetailsPanel = new PlayerDetailsPanel(cardLayout, parentPanel);
+        DifficultyChoosePanel difficultyChoosePanel = new DifficultyChoosePanel(cardLayout, parentPanel, user);
+        GamePanel gamePanel = new GamePanel(cardLayout, parentPanel, user, difficultyLevel);
+        ScorePanel scorePanel = new ScorePanel(0, 0, cardLayout, beginPanel);
         LeaderboardPanel leaderboardPanel = new LeaderboardPanel(cardLayout, parentPanel);
 
         parentPanel.add(beginPanel, "Begin");
@@ -32,7 +39,9 @@ public class Main {
         parentPanel.add(mainMenuPanel, "MainMenu");
         parentPanel.add(leaderboardPanel, "Leaderboard");
         parentPanel.add(playerDetailsPanel, "PlayerDetails");
+        parentPanel.add(difficultyChoosePanel, "DifficultyChoose");
         parentPanel.add(gamePanel, "Game");
+        parentPanel.add(scorePanel, "Score");
 
         beginPanel.setBackground(new Color(255, 255, 255));
         CustomButton btnBegin = new CustomButton("BEGIN");

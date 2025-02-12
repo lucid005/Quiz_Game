@@ -1,6 +1,10 @@
-package database;
+	package database;
 
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,31 +101,31 @@ public class QuestionDAO {
     public List<Question_model> getQuizQuestionByDifficultyLevel(String difficultyLevel) {
         List<Question_model> questions = new ArrayList<>();
         Connection connection = DatabaseConnection.getConnection();
-            if (connection == null) {
-                return questions; 
-            }
+        
+        if (connection == null) {
+            return questions; 
+        }
 
-            String selectSQL = "SELECT * FROM quiz_questions WHERE difficulty_level = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(selectSQL)) {
-                stmt.setString(1, difficultyLevel);
+        String selectSQL = "SELECT * FROM quiz_questions WHERE difficulty_level = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(selectSQL)) {
+            stmt.setString(1, difficultyLevel);
 
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        Question_model question = new Question_model(
-                                rs.getInt("question_id"),
-                                rs.getString("question_text"),
-                                rs.getString("option_a"),
-                                rs.getString("option_b"),
-                                rs.getString("option_c"),
-                                rs.getString("option_d"),
-                                rs.getString("correct_answer"),
-                                rs.getString("difficulty_level")
-                        );
-                        questions.add(question);
-                    }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Question_model question = new Question_model(
+                            rs.getInt("question_id"),
+                            rs.getString("question_text"),
+                            rs.getString("option_a"),
+                            rs.getString("option_b"),
+                            rs.getString("option_c"),
+                            rs.getString("option_d"),
+                            rs.getString("correct_answer"),
+                            rs.getString("difficulty_level")
+                    );
+                    questions.add(question);
                 }
             }
-         catch (SQLException e) {
+        } catch (SQLException e) {
             System.err.println("Error retrieving quiz questions: " + e.getMessage());
         }
 
